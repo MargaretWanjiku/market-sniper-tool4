@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Sniper Tool - Trading Intelligence Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: #0b0f0e; color: #E0E0E0; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 480px; min-height: 100vh; background-color: #0b0f0e; display: flex; flex-direction: column; position: relative; }
+
+        /* Screen Controller */
+        .screen { display: none; flex-direction: column; width: 100%; min-height: 100vh; }
+        .screen.active { display: flex; }
+
+        /* ==========================================
+           1. MARKET SNIPER LANDING SCREEN
+           ========================================== */
+        .landing-wrapper { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; flex-grow: 1; }
+        .api-badge { align-self: center; background: rgba(0, 199, 140, 0.1); border: 1px solid rgba(0, 199, 140, 0.3); color: #00C78C; padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .api-dot { width: 6px; height: 6px; background-color: #00C78C; border-radius: 50%; box-shadow: 0 0 6px #00C78C; }
+        
+        .hero-section { text-align: center; display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .lightning-icon { font-size: 2rem; color: #f59e0b; }
+        .hero-section h1 { font-size: 1.8rem; font-weight: 700; color: #fff; }
+        .hero-section p { font-size: 0.85rem; color: #9ca3af; line-height: 1.4; }
+        .sub-desc { font-size: 0.78rem; color: #6b7280; }
+
+        .access-tool-btn { width: 100%; background: #00C78C; color: #0b0f0e; border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; text-align: center; box-shadow: 0 4px 20px rgba(0, 199, 140, 0.2); transition: background 0.2s; }
+        .access-tool-btn:hover { background: #00b37d; }
+
+        .stats-grid { display: flex; gap: 12px; }
+        .stat-card { flex: 1; background: #121816; border: 1px solid #1f2b26; border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-card h3 { font-size: 1.2rem; color: #fff; font-weight: 700; margin-bottom: 4px; }
+        .stat-card p { font-size: 0.72rem; color: #8b9e96; }
+
+        .feature-card { background: #121816; border: 1px solid #1f2b26; border-radius: 12px; padding: 16px; display: flex; gap: 14px; align-items: flex-start; }
+        .feature-icon-box { background: rgba(0, 199, 140, 0.1); border: 1px solid rgba(0, 199, 140, 0.2); padding: 10px; border-radius: 8px; color: #00C78C; font-size: 1rem; }
+        .feature-content h4 { font-size: 0.88rem; color: #fff; font-weight: 600; margin-bottom: 3px; }
+        .feature-content p { font-size: 0.75rem; color: #8b9e96; line-height: 1.4; }
+
+        .risk-warning-box { background: rgba(255, 51, 102, 0.05); border: 1px solid rgba(255, 51, 102, 0.2); border-radius: 12px; padding: 14px; font-size: 0.7rem; color: #9ca3af; line-height: 1.4; }
+        .risk-warning-box a { color: #00C78C; text-decoration: underline; }
+        .footer-info { text-align: center; font-size: 0.7rem; color: #6b7280; padding-bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+
+        /* ==========================================
+           2. DERIV SIGN-IN / OAUTH SCREEN
+           ========================================== */
+        .deriv-auth-wrapper { padding: 24px 20px; display: flex; flex-direction: column; gap: 20px; justify-content: center; flex-grow: 1; }
+        .deriv-auth-card { background: #121816; border: 1px solid #1f2b26; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+        .deriv-auth-card h3 { color: #fff; font-size: 1.2rem; font-weight: 700; text-align: center; }
+        .deriv-input { background: #0b0f0e; border: 1px solid #2a3531; border-radius: 8px; padding: 12px; color: #fff; font-size: 0.9rem; width: 100%; outline: none; }
+        .deriv-input:focus { border-color: #00C78C; }
+        .deriv-submit-btn { background: #00C78C; color: #0b0f0e; border: none; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: background 0.2s; }
+        .deriv-submit-btn:hover { background: #00b37d; }
+        .oauth-official-btn { background: #2563eb; color: #fff; border: none; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; text-align: center; text-decoration: none; display: block; }
+        .oauth-official-btn:hover { background: #1d4ed8; }
+
+        /* ==========================================
+           3. DASHBOARD & PAYWALLS
+           ========================================== */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background-color: #0b0f0e; border-bottom: 1px solid #16221d; }
+        .logo-area { display: flex; align-items: center; gap: 8px; }
+        header h1 { font-size: 1.1rem; font-weight: 700; color: #00C78C; letter-spacing: 0.3px; }
+        
+        .user-panel { display: flex; align-items: center; gap: 8px; }
+        .user-status { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; background: #121816; padding: 6px 12px; border-radius: 20px; border: 1px solid #1f2b26; color: #00C78C; font-weight: 500; cursor: pointer; user-select: none; }
+        .status-dot { width: 7px; height: 7px; background-color: #00C78C; border-radius: 50%; display: inline-block; box-shadow: 0 0 6px #00C78C; }
+        .help-btn { background: #121816; color: #00C78C; border: 1px solid #1f2b26; width: 28px; height: 28px; border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+
+        /* Navigation Tab Order */
+        .locked-nav { display: flex; background-color: #0b0f0e; padding: 10px 16px; gap: 8px; overflow-x: auto; border-bottom: 1px solid #16221d; scrollbar-width: none; }
+        .locked-nav::-webkit-scrollbar { display: none; }
+        .locked-tab { background: #121816; border: 1px solid #1f2b26; color: #8b9e96; padding: 8px 14px; border-radius: 8px; font-size: 0.78rem; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 6px; font-weight: 500; transition: 0.2s; }
+        .locked-tab.active { background: #00C78C; color: #0b0f0e; border-color: #00C78C; font-weight: 700; }
+
+        .view-section { display: none; padding: 16px; flex-direction: column; gap: 14px; }
+        .view-section.active { display: flex; }
+
+        /* Paywall Card Architecture */
+        .paywall-card { background-color: #121816; border: 1px solid #1f2b26; border-radius: 16px; padding: 22px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 10px; }
+        .lock-icon-container { font-size: 1.4rem; }
+        .paywall-title { font-size: 1rem; color: #fff; font-weight: 700; }
+        .paywall-desc { font-size: 0.75rem; color: #8b9e96; line-height: 1.4; }
+        .price-tag { font-size: 1.1rem; color: #00C78C; font-weight: 800; margin: 4px 0; }
+        
+        .payment-methods { display: flex; gap: 8px; width: 100%; margin-top: 4px; }
+        .pm-btn { flex: 1; background: #0b0f0e; border: 1px solid #1f2b26; padding: 8px; border-radius: 8px; color: #8b9e96; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+        .pm-btn.active { border-color: #00C78C; color: #00C78C; background: rgba(0,199,140,0.05); }
+
+        .mpesa-box { width: 100%; background: #0b0f0e; border: 1px solid #1f2b26; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+        .mpesa-label { font-size: 0.7rem; color: #8b9e96; }
+        .mpesa-row { display: flex; justify-content: space-between; align-items: center; background: #16221d; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #fff; }
+        .copy-btn { color: #00C78C; font-size: 0.75rem; cursor: pointer; background: none; border: none; font-weight: 700; }
+        
+        .ref-input { width: 100%; background: #0b0f0e; border: 1px solid #2a3531; border-radius: 8px; padding: 10px; color: #fff; font-size: 0.8rem; outline: none; }
+        .unlock-action-btn { width: 100%; background: #00C78C; color: #0b0f0e; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; margin-top: 4px; }
+
+        /* Rise / Fall Live Cards & Automated Terminal */
+        .market-card { background-color: #121816; border-radius: 14px; padding: 16px; border: 1px solid #1f2b26; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .market-card-top { width: 100%; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        .asset-title { font-size: 0.95rem; color: #FFF; font-weight: 600; text-align: left; }
+        .asset-symbol { font-size: 0.7rem; color: #6b7280; text-align: left; margin-top: 2px; }
+        .live-tag { font-size: 0.68rem; color: #00C78C; font-weight: 600; letter-spacing: 0.5px; }
+
+        .signal-circle { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: bold; margin-bottom: 8px; box-shadow: 0 0 12px rgba(0,0,0,0.3); }
+        .circle-fall { background-color: #FF3366; color: #fff; }
+        .circle-rise { background-color: #00C78C; color: #0b0f0e; }
+        .confidence-text { font-size: 0.78rem; color: #f59e0b; margin-bottom: 10px; font-weight: 500; }
+        .action-pill { padding: 5px 16px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; background: rgba(0, 199, 140, 0.1); border: 1px solid #00C78C; color: #00C78C; }
+        .auto-trade-btn { width: 100%; margin-top: 12px; background: #2563eb; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+        .auto-trade-btn:hover { background: #1d4ed8; }
+        .terminal-log { background: #070a09; border: 1px solid #1f2b26; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 0.7rem; color: #00C78C; max-height: 100px; overflow-y: auto; text-align: left; width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- STAGE 1: MARKET SNIPER LANDING SCREEN -->
+        <div class="screen active" id="landingScreen">
+            <div class="landing-wrapper">
+                <div class="api-badge">
+                    <span class="api-dot"></span> Deriv API Operational
+                </div>
+
+                <div class="hero-section">
+                    <div class="lightning-icon">⚡</div>
+                    <h1>Market Sniper Tool</h1>
+                    <p>Precision digit signals built for Volatility Indices.</p>
+                    <div class="sub-desc">Advanced prediction tool for Volatility Indices.</div>
+                </div>
+
+                <button class="access-tool-btn" onclick="goToDerivAuth()">Access Tool &rarr;</button>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>High</h3>
+                        <p>Signal Accuracy</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>10+</h3>
+                        <p>Signals Per Day</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">⚡</div>
+                    <div class="feature-content">
+                        <h4>Real-time Signal Engine</h4>
+                        <p>Algorithmic digit probability & pattern predictions for Volatility Indices.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">🔒</div>
+                    <div class="feature-content">
+                        <h4>Direct Deriv OAuth</h4>
+                        <p>Secure token authentication without storing sensitive account passwords.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">🔄</div>
+                    <div class="feature-content">
+                        <h4>Flexible Account Switching</h4>
+                        <p>Seamlessly toggle between Real and Demo trading accounts in one click.</p>
+                    </div>
+                </div>
+
+                <div class="risk-warning-box">
+                    ⚠️ Deriv offers complex derivatives, such as options and contracts for difference ("CFDs"). These products may not be suitable for all clients, and trading them puts you at risk. Please make sure that you understand the following risks before trading Deriv products: a) you may lose some or all of the money you invest in the trade, b) if your trade involves currency conversion, exchange rates will affect your profit and loss. You should never trade with borrowed money or with money that you cannot afford to lose. By signing in you also confirm you have read and accepted our <a href="#" onclick="alert('Terms of Service & Risk Disclaimer')">Terms of Service & Risk Disclaimer</a>. All losses from automated systems connected to this platform are your sole responsibility.
+                </div>
+
+                <div class="footer-info">
+                    <span>🛡️ Encrypted & Isolated Token Session</span>
+                    <span style="color: #00C78C; cursor: pointer;" onclick="alert('Support & M-Pesa payment line: 0792568120')">Need assistance?</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 2: DERIV SIGN-IN / OAUTH SCREEN -->
+        <div class="screen" id="derivAuthScreen">
+            <div class="deriv-auth-wrapper">
+                <div class="deriv-auth-card">
+                    <h3>Sign in with Deriv</h3>
+                    <p style="font-size: 0.8rem; color: #8b9e96; text-align: center;">Connect your Deriv trading account to unlock live predictive analytics.</p>
+                    
+                    <input type="email" id="derivEmail" class="deriv-input" placeholder="Enter your Deriv email">
+                    <input type="password" id="derivPassword" class="deriv-input" placeholder="Enter your Deriv password">
+                    <button class="deriv-submit-btn" onclick="submitDerivLogin()">Authorize & Launch Tool</button>
+                    
+                    <div style="text-align: center; font-size: 0.75rem; color: #6b7280; margin: 4px 0;">- OR -</div>
+                    
+                    <a href="https://oauth.deriv.com/oauth2/authorize?app_id=34vilFxEI2eZqvcIxwxqe&brand=deriv" class="oauth-official-btn">Sign in via Official Deriv OAuth</a>
+                    
+                    <button style="background: transparent; border: none; color: #8b9e96; font-size: 0.75rem; cursor: pointer; margin-top: 8px;" onclick="backToLanding()">&larr; Back to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 3: DASHBOARD & PAYWALLS -->
+        <div class="screen" id="dashboardScreen">
+            <!-- Header Bar -->
+            <header>
+                <div class="logo-area">
+                    <svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="36" height="36" rx="8" fill="#121816" stroke="#1f2b26" stroke-width="1.5"/>
+                        <path d="M8 24L15 15L21 19L28 9" stroke="#00C78C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="28" cy="9" r="3" fill="#00C78C"/>
+                    </svg>
+                    <h1>Market Sniper</h1>
+                </div>
+                <div class="user-panel">
+                    <!-- Admin approval trigger: Triple-tap this Active badge and enter PIN 079256 -->
+                    <div class="user-status" id="adminTriggerBtn" title="Admin Approval Panel">
+                        <span class="status-dot"></span> <span id="statusText">Active</span>
+                    </div>
+                    <button class="help-btn" onclick="alert('Market Sniper v2.4 - Automated execution engine connected.')">?</button>
+                </div>
+            </header>
+
+            <!-- Navigation Tabs Bar -->
+            <div class="locked-nav">
+                <button class="locked-tab active" id="tab-matches" onclick="switchView('matches', this)">🔒 Matches</button>
+                <button class="locked-tab" id="tab-evenodd" onclick="switchView('evenodd', this)">🔒 Even / Odd</button>
+                <button class="locked-tab" id="tab-overunder" onclick="switchView('overunder', this)">🔒 Over / Under</button>
+                <button class="locked-tab" id="tab-higherlower" onclick="switchView('higherlower', this)">🔒 Higher / Lower</button>
+                <button class="locked-tab" id="tab-risefall" onclick="switchView('risefall', this)">Rise / Fall</button>
+            </div>
+
+            <!-- TAB 1: MATCHES PAYWALL -->
+            <div class="view-section active" id="view-matches">
+                <div class="paywall-card">
+                    <div class="lock-icon-container">🔒</div>
+                    <div class="paywall-title">Matches is not in your plan</div>
+                    <div class="paywall-desc">Add Matches as a separate plan — your existing access stays active.</div>
+                    <div class="price-tag">$ 100 /YEAR MATCHES TOOL</div>
+                    <div class="payment-methods">
+                        <button class="pm-btn active" onclick="togglePayment(this)">📱 M-Pesa</button>
+                        <button class="pm-btn" onclick="togglePayment(this)">🌐 Crypto</button>
+                    </div>
+                    <div class="mpesa-box">
+                        <div class="mpesa-label">Send via M-Pesa to:</div>
+                        <div class="mpesa-row"><span id="mpesaNumber">0792568120</span> <button class="copy-btn" onclick="copyMpesa()">COPY</button></div>
+                    </div>
+                    <input type="text" class="ref-input" id="ref-matches" placeholder="Paste transaction ref ID here...">
+                    <button class="unlock-action-btn" onclick="submitUnlock('Matches')">Unlock Matches</button>
+                </div>
+            </div>
+
+            <!-- TAB 2: EVEN / ODD PAYWALL -->
+            <div class="view-section" id="view-evenodd">
+                <div class="paywall-card">
+                    <div class="lock-icon-container">🔒</div>
+                    <div class="paywall-title">Even / Odd is not in your plan</div>
+                    <div class="paywall-desc">Add Even / Odd as a separate plan — your existing access stays active.</div>
+                    <div class="price-tag">$ 100 /YEAR EVEN/ODD TOOL</div>
+                    <div class="payment-methods">
+                        <button class="pm-btn active" onclick="togglePayment(this)">📱 M-Pesa</button>
+                        <button class="pm-btn" onclick="togglePayment(this)">🌐 Crypto</button>
+                    </div>
+                    <div class="mpesa-box">
+                        <div class="mpesa-label">Send via M-Pesa to:</div>
+                        <div class="mpesa-row"><span>0792568120</span> <button class="copy-btn" onclick="copyMpesa()">COPY</button></div>
+                    </div>
+                    <input type="text" class="ref-input" id="ref-evenodd" placeholder="Paste transaction ref ID here...">
+                    <
